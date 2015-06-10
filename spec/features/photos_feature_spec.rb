@@ -6,7 +6,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
   let(:photo) { photos(:one) }
 
   describe "GET /photos" do
-    it "displays photos", points: 5 do
+    it "displays photos", points: 1 do
       visit "/photos"
 
       expect(page).to have_content(photo.source)
@@ -15,7 +15,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
   end
 
   describe "GET /photos/:id" do
-    it "displays photo", points: 5 do
+    it "displays photo", points: 3 do
       visit "/photos/#{photo.id}"
 
       expect(page).to have_content(photo.source)
@@ -24,7 +24,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
   end
 
   describe "GET /photos/new_form" do
-    it "displays new photo form", points: 5 do
+    it "displays new photo form", points: 4 do
       visit "/photos/new_form"
 
       expect(page).to have_selector('input#source')
@@ -45,7 +45,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
   end
 
   describe "GET /photos/:id/edit_form" do
-    it "displays edit photo form", points: 5 do
+    it "displays edit photo form", points: 4 do
       visit "/photos"
       find(:xpath, "//a[@href='/photos/#{photo.id}/edit']").click
 
@@ -70,7 +70,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
   end
 
   describe "GET /delete_photo/:id/" do
-    it "deletes photo", points: 5 do
+    it "deletes photo", points: 3 do
       visit "/photos/"
       find(:xpath, "//a[@href='/delete_photo/#{photo.id}']").click
 
