@@ -9,7 +9,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
     it "displays photos", points: 1 do
       visit "/photos"
 
-      expect(page).to have_content(photo.source)
+      expect(page).to have_xpath("//img[@src = '#{photo.source}']")
       expect(page).to have_content(photo.caption)
     end
   end
@@ -18,7 +18,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
     it "displays photo", points: 3 do
       visit "/photos/#{photo.id}"
 
-      expect(page).to have_content(photo.source)
+      expect(page).to have_xpath("//img[@src = '#{photo.source}']")
       expect(page).to have_content(photo.caption)
     end
   end
@@ -46,7 +46,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
       end
       form.submit!
 
-      expect(page).to have_content('https://www.google.com/images/srpr/logo11w.png')
+      expect(page).to have_xpath("//img[@src = 'https://www.google.com/images/srpr/logo11w.png']")
       expect(page).to have_content('Google logo')
     end
   end
@@ -54,7 +54,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
   describe "GET /photos/:id/edit_form" do
     it "displays edit photo form", points: 4 do
       visit "/photos"
-      find(:xpath, "//a[@href='/photos/#{photo.id}/edit']").click
+      find(:xpath, "//a[@href='http://localhost:3000/photos/#{photo.id}/edit']").click
 
       expect(page).to have_selector("input#source[value='#{photo.source}']")
       expect(page).to have_selector("input#caption[value='#{photo.caption}']")
@@ -64,7 +64,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
   describe "GET /update_photo/:id" do
     it "updates photo", points: 5 do
       visit "/photos/"
-      find(:xpath, "//a[@href='/photos/#{photo.id}/edit_form']").click
+      find(:xpath, "//a[@href='http://localhost:3000/photos/#{photo.id}/edit_form']").click
       fill_in 'source', with: 'https://www.google.com/images/srpr/logo11w.png'
       fill_in 'caption', with: 'Google logo'
 
@@ -78,7 +78,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
 
       expect(page).not_to have_content(photo.source)
       expect(page).not_to have_content(photo.caption)
-      expect(page).to have_content('https://www.google.com/images/srpr/logo11w.png')
+      expect(page).to have_xpath("//img[@src = 'https://www.google.com/images/srpr/logo11w.png']")
       expect(page).to have_content('Google logo')
     end
   end
@@ -86,7 +86,7 @@ RSpec.describe 'CRUD Photos', type: :feature do
   describe "GET /delete_photo/:id/" do
     it "deletes photo", points: 3 do
       visit "/photos/"
-      find(:xpath, "//a[@href='/delete_photo/#{photo.id}']").click
+      find(:xpath, "//a[@href='http://localhost:3000/delete_photo/#{photo.id}']").click
 
       expect(page).not_to have_content(photo.source)
       expect(page).not_to have_content(photo.caption)
