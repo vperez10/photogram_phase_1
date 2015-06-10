@@ -37,7 +37,14 @@ RSpec.describe 'CRUD Photos', type: :feature do
       visit "/photos/new_form"
       fill_in 'source', with: 'https://www.google.com/images/srpr/logo11w.png'
       fill_in 'caption', with: 'Google logo'
-      click_button 'Create Photo'
+
+      form = page.find("form")
+      class << form
+        def submit!
+          Capybara::RackTest::Form.new(driver, native).submit({})
+        end
+      end
+      form.submit!
 
       expect(page).to have_content('https://www.google.com/images/srpr/logo11w.png')
       expect(page).to have_content('Google logo')
@@ -60,7 +67,14 @@ RSpec.describe 'CRUD Photos', type: :feature do
       find(:xpath, "//a[@href='/photos/#{photo.id}/edit_form']").click
       fill_in 'source', with: 'https://www.google.com/images/srpr/logo11w.png'
       fill_in 'caption', with: 'Google logo'
-      click_button 'Update Photo'
+
+      form = page.find("form")
+      class << form
+        def submit!
+          Capybara::RackTest::Form.new(driver, native).submit({})
+        end
+      end
+      form.submit!
 
       expect(page).not_to have_content(photo.source)
       expect(page).not_to have_content(photo.caption)
