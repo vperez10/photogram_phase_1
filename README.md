@@ -51,6 +51,7 @@ To start with, we'll keep it simple and manage just one resource: photos. Our go
 [http://photogram-golden-7.herokuapp.com](http://photogram-golden-7.herokuapp.com)
 
 Eventually, we'll add the ability to sign up, upload photos, and follow other users, and we'll wind up building Instagram. But for now, anonymous visitors will simply copy-paste the URLs of images that are already on the Internet.
+
 ## Setup
 
  1. Read the instructions completely.
@@ -64,7 +65,7 @@ Eventually, we'll add the ability to sign up, upload photos, and follow other us
 
 ### READ (index, show)
 
-Once you run through the setup, you will already have
+Once you run through the setup, you will already have a few things:
 
  - I've created table created called `photos` that has two columns in it:
   - `source` (where we'll store the URL of each photo)
@@ -91,13 +92,29 @@ Under each photo on the index page, there is a link labeled "Show". The `href`s 
  - [http://localhost:3000/photos/3](http://localhost:3000/photos/3)
  - [http://localhost:3000/photos/4](http://localhost:3000/photos/4)
 
-**Your first job** is to make these URLs work to display a photo details page for each individual photo. In particular, in the `show` action, use the number after the slash to retrieve the row from the `photo` table with the corresponding `id`, and use that row's `source` value to draw the `<img>` in the view. Toss in the `caption`, too.
+**Your first job** is to make these URLs work to display a photo details page for each individual photo.
+
+I've already added a variable route to support URLs like this. But you have to, in the `show` action, use the number after the slash to retrieve the row from the `photo` table with the corresponding `id`, and use that row's `source` value to draw the `<img>` in the view. Toss in the `caption`, too.
 
 Hints: Remember your [Ruby CRUD Cheatsheet][1], and what you know about the `params` hash.
 
+### DELETE (destroy)
+
+Under each photo on the index page, there is a link labeled "Delete". The markup for these links look like:
+
+    <a href="http://localhost:3000/delete_photo/<%= photo.id %>">Delete</a>
+
+Does it make sense how that link is being put together?
+
+When I click that link, the photo should be removed from the database.
+
+Write a route, action, and view to make that happen. To start you off, here's a route:
+
+    get("/delete_photo/:id", { :controller => "photos", :action => "destroy" })
+
 ### CREATE (new_form, create_row)
 
-We're now done with the "R" in CRUD. Our users can **Read** individual rows and collections of rows from our photos table. But they still have to depend on us to create the data in the first place, through the Rails console or something.
+We're now done with the "R" and "D" in CRUD. Our users can **Read** individual rows and collections of rows from our photos table, and they can **Delete** rows. But they still have to depend on us to create the data in the first place, through the Rails console or something.
 
 Let's now attack the "C" in CRUD: **Create**. We want to allow users to generate content for our applications; that is almost always where the greatest value lies.
 
@@ -117,17 +134,23 @@ It's been a while since we've done any forms, but let's shake off the rust and r
 
     <form>
       <div>
-        <label for="photo_caption">Caption:</label>
-        <input id="photo_caption" type="text" name="the_caption">
+        <label>Caption:</label>
+        <input type="text" name="the_caption">
       </div>
       <div>
-        <label for="photo_image_url">Image URL:</label>
-        <input id="photo_image_url" type="text" name="the_source">
+        <label>Image URL:</label>
+        <input type="text" name="the_source">
       </div>
       <div>
         <button>Create Photo</button>
       </div>
     </form>
+
+That's all you have to do for this week's assignment; get the blank form to show up.
+
+## Optional: Food for thought
+
+However, consider the following:
 
 It turns out that forms, when submitted, take the values that users type in to the inputs and add them to the request. However, they do it by tacking them on to the end of the URL after a `?`, in what is called a **query string**.
 
@@ -157,97 +180,9 @@ Fortunately, we can very easily pick which URL receives the data from a form: it
 
 Think of the action attribute as being like the `href` attribute of the `<a>` tag. It determines where the user is sent after they click. The only difference between a form and a link is that when the user clicks a form, some extra data comes along for the ride, but either way, the user is sent to a new URL.
 
-Of course, if you click it right now, you'll receive a "NO ROUTE MATCHES" error -- because we haven't set up a route to support `"/create_photo"`. Let's do that:
+Of course, if you click it right now, you'll receive a "NO ROUTE MATCHES" error -- because we haven't set up a route to support `"/create_photo"`.
 
-#### create_row
-
-    get("/create_photo", { :controller => "photos", :action => "create_row" })
-
-Add the action and view for that route. Put some static HTML in the view for now.
-
-**Your next job** is to write some Ruby in the `create` action to:
-
- - create a new row for the photos table
- - fill in its column values by pulling the information the user typed into the form out of the `params` hash
- - save it
-
-Once this action has done its job of adding a row to the table, we have to make a choice: do we display a confirmation message in the view template, or do we simply send the user back to the index page?
-
-If the former, simply add whatever HTML to the view template you think is appropriate. It's usually helpful to at least include a link back to the index page.
-
-If you instead just want to send the user back to the index page immediately, try the following in the action instead of `render`:
-
-    redirect_to("http://localhost:3000/photos")
-
-### DELETE (destroy)
-
-Under each photo on the index page, there is a link labeled "Delete". The markup for these links look like:
-
-    <a href="http://localhost:3000/delete_photo/<%= photo.id %>">Delete</a>
-
-Does it make sense how that link is being put together?
-
-When I click that link, the photo should be removed and I should be sent back to the index page.
-
-Write a route, action, and view to make that happen. To start you off, here's a route:
-
-    get("/delete_photo/:id", { :controller => "photos", :action => "destroy" })
-
-### UPDATE (edit_form, update_row)
-
-#### edit_form
-
-Under each photo on the index page, there is a link labeled "Edit". The markup for these links look like:
-
-    <a href="http://localhost:3000/photos/<%= photo.id %>/edit">Edit</a>
-
-Add a route to support this action:
-
-    get("/photos/:id/edit", { :controller => "photos", :action => "edit_form" })
-
-The job of this action should be to display a form to edit an existing photo, somewhat like the `new_form` action.
-
-It's a little more complicated than `new_form`, though, because instead of showing a blank form, you should show a form that's pre-populated with the current values for a particular photo (determined by what's after the slash).
-
-Hint: You can pre-fill an `<input>` with the `value=""` attribute; e.g.,
-
-    <input type="text" name="the_caption" value="<%= @photo.caption %>">
-
-The `action` attributes of your edit forms should look like this:
-
-    <form action="http://localhost:3000/update_photo/4">
-
-so that when the user clicks submit, we can finally do the work of updating our database...
-
-#### update_row
-
-Add another route:
-
-    get("/update_photo/:id", { :controller => "photos", :action => "update_row" })
-
-The job of this action is to receive data from an edit form, retrieve the corresponding row from the table, and update it with the revised information. Give it a shot.
-
-Afterwards, redirect the user to the details page of the photo that was just edited.
-
-## Rinse and repeat
-
-This is optional, but when I was learning this material, I found sheer repetition to be really helpful in connecting the dots in my brain.
-
-A suggestion: download a fresh copy of this repo again, and repeat the whole process. Try to rely less on the instructions this time.
-
-Rinse and repeat.
-
-## Conclusion
-
-If we can connect all these dots, we will have completed one entire database-backed CRUD web resource. Every web application is essentially just a collection of multiple of these resources; they are the building blocks of everything we do, and we'll just cruise from here.
-
-Struggle with it; **come up with questions**.
-
-#### Optional challenge, for fun:
-
-Connect [Bootstrap][2] or a [Bootswatch][3] and make the index page look similar to [this][4], but without the user avatars and comments.
-
-You can find and modify the `<head>` and other boilerplate that wrap all of your view templates in `/app/views/layouts/application.html.erb`.
+Can you start to imagine how we'll make the form actually work to add a row to our table?
 
 
   [1]: https://gist.github.com/rbetina/bb6336ead63080be2ff4
