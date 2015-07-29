@@ -3,5 +3,8 @@ class PhotosController < ApplicationController
     @list_of_photos = Photo.all
   end
 
+def show
+render("photos/application.html.erb")
+end
 
 end
