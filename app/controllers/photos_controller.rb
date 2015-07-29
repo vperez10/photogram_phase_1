@@ -4,7 +4,7 @@ class PhotosController < ApplicationController
   end
 
 def show
-render("photos/application.html.erb")
+render("show.html.erb")
 end
 
 end
